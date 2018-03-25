@@ -7,7 +7,7 @@ Author URI: http://embraceyourinnerengineer.com
 Version: 0.1
 */
 
-
+define( 'WPPLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 function wpplugin_settings_page()
 {
@@ -126,5 +126,79 @@ function wpplugin_add_settings_link($links){
 $filter_name = "plugin_action_links_" . plugin_basename(__FILE__);
 add_filter( $filter_name, 'wpplugin_add_settings_link');
 
+
+// Conditionally load CSS on plugin settings pages only
+function wpplugin_admin_styles( $hook ) {
+
+  wp_register_style(
+    'wpplugin-admin',
+    WPPLUGIN_URL . 'css/wpplugin-admin-style.css',
+    [],
+    time()
+  );
+
+  if( 'toplevel_page_wpplugin' == $hook ) {
+    wp_enqueue_style( 'wpplugin-admin' );
+  }
+
+}
+add_action( 'admin_enqueue_scripts', 'wpplugin_admin_styles' );
+
+
+// Load CSS on the frontend
+function wpplugin_frontend_styles() {
+
+  wp_register_style(
+    'wpplugin-frontend',
+    WPPLUGIN_URL . 'css/wpplugin-frontend-style.css',
+    [],
+    time()
+  );
+
+  if( is_single() ) {
+      wp_enqueue_style( 'wpplugin-frontend' );
+  }
+
+}
+add_action( 'wp_enqueue_scripts', 'wpplugin_frontend_styles', 100 );
+
+// Conditionally load JS on plugin settings pages only
+function wpplugin_admin_scripts( $hook ) {
+
+  wp_register_script(
+    'wpplugin-admin',
+    WPPLUGIN_URL . 'js/wpplugin-admin.js',
+    ['jquery'],
+    time()
+  );
+
+  wp_localize_script( 'wpplugin-admin', 'wpplugin', [
+      'hook' => $hook
+  ]);
+
+  if( 'toplevel_page_wpplugin' == $hook ) {
+      wp_enqueue_script( 'wpplugin-admin' );
+  }
+
+}
+add_action( 'admin_enqueue_scripts', 'wpplugin_admin_scripts' );
+
+
+// Conditionally load JS on single post pages
+function wpplugin_frontend_scripts() {
+
+  wp_register_script(
+    'wpplugin-frontend',
+    WPPLUGIN_URL . 'js/wpplugin-frontend.js',
+    [],
+    time()
+  );
+
+  if( is_single() ) {
+      wp_enqueue_script( 'wpplugin-frontend' );
+  }
+
+}
+add_action( 'wp_enqueue_scripts', 'wpplugin_frontend_scripts', 100 );
 
 ?>

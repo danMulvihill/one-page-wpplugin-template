@@ -1,0 +1,1 @@
+console.log("This JS is from the Generic Plugin!");
